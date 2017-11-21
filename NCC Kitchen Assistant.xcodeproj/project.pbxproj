@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E222C0E41FC4B79B005854F0 /* MSAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E222C0E31FC4B79B005854F0 /* MSAL.framework */; };
 		E2768ED61FBE126C00619473 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2768ED51FBE126C00619473 /* AppDelegate.swift */; };
 		E2768ED81FBE126C00619473 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2768ED71FBE126C00619473 /* ViewController.swift */; };
 		E2768EDB1FBE126C00619473 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2768ED91FBE126C00619473 /* Main.storyboard */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E222C0E31FC4B79B005854F0 /* MSAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MSAL.framework; path = Carthage/Build/iOS/MSAL.framework; sourceTree = "<group>"; };
 		E2768ED21FBE126C00619473 /* NCC Kitchen Assistant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NCC Kitchen Assistant.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2768ED51FBE126C00619473 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E2768ED71FBE126C00619473 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E222C0E41FC4B79B005854F0 /* MSAL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +77,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E222C0E21FC4B79B005854F0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				E222C0E31FC4B79B005854F0 /* MSAL.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E2768EC91FBE126C00619473 = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +92,7 @@
 				E2768EE91FBE126C00619473 /* NCC Kitchen AssistantTests */,
 				E2768EF41FBE126C00619473 /* NCC Kitchen AssistantUITests */,
 				E2768ED31FBE126C00619473 /* Products */,
+				E222C0E21FC4B79B005854F0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -135,6 +147,7 @@
 				E2768ECE1FBE126C00619473 /* Sources */,
 				E2768ECF1FBE126C00619473 /* Frameworks */,
 				E2768ED01FBE126C00619473 /* Resources */,
+				E222C0E51FC4B7B9005854F0 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -193,15 +206,18 @@
 				TargetAttributes = {
 					E2768ED11FBE126C00619473 = {
 						CreatedOnToolsVersion = 8.3.3;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
 					E2768EE51FBE126C00619473 = {
 						CreatedOnToolsVersion = 8.3.3;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						TestTargetID = E2768ED11FBE126C00619473;
 					};
 					E2768EF01FBE126C00619473 = {
 						CreatedOnToolsVersion = 8.3.3;
+						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						TestTargetID = E2768ED11FBE126C00619473;
 					};
@@ -253,6 +269,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E222C0E51FC4B7B9005854F0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/MSAL.framework",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E2768ECE1FBE126C00619473 /* Sources */ = {
@@ -414,6 +447,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = "NCC Kitchen Assistant/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "NCC.NCC-Kitchen-Assistant";
@@ -426,6 +463,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = "NCC Kitchen Assistant/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "NCC.NCC-Kitchen-Assistant";
@@ -507,6 +548,7 @@
 				E2768EFC1FBE126C00619473 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E2768EFD1FBE126C00619473 /* Build configuration list for PBXNativeTarget "NCC Kitchen AssistantTests" */ = {
 			isa = XCConfigurationList;
@@ -515,6 +557,7 @@
 				E2768EFF1FBE126C00619473 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E2768F001FBE126C00619473 /* Build configuration list for PBXNativeTarget "NCC Kitchen AssistantUITests" */ = {
 			isa = XCConfigurationList;
@@ -523,6 +566,7 @@
 				E2768F021FBE126C00619473 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
