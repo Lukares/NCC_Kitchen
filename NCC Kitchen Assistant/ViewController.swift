@@ -3,7 +3,7 @@ import MSAL
 
 class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate {
     
-    let kClientID = "2ea9f1f8-d612-4e18-84aa-cf70bfd5b298"
+    let kClientID = "a43b5ef7-6217-4310-911f-6eb26d15ca1c"
     let kAuthority = "https://login.microsoftonline.com/common/v2.0"
     
     let kGraphURI = "https://graph.microsoft.com/v1.0/me/"

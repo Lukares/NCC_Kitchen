@@ -44,7 +44,7 @@
             <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>msal2ea9f1f8-d612-4e18-84aa-cf70bfd5b298</string>
+                <string>msala43b5ef7-6217-4310-911f-6eb26d15ca1c</string>
                 <string>auth</string>
             </array>
         </dict>
