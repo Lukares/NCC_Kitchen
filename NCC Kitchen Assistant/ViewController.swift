@@ -15,6 +15,36 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     @IBOutlet weak var loggingText: UITextView!
     @IBOutlet weak var signoutButton: UIButton!
     
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        do {
+            // Initialize a MSALPublicClientApplication with a given clientID and authority
+            self.applicationContext = try MSALPublicClientApplication.init(clientId: kClientID, authority: kAuthority)
+        } catch {
+            self.loggingText.text = "Unable to create Application Context. Error: \(error)"
+        }
+    }
+    
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        if self.accessToken.isEmpty {
+            signoutButton.isEnabled = false; 
+        }
+    }
+    
+    @IBAction func unwindToHome(segue: UIStoryboardSegue) {
+        
+    }
+    
+    
     // This button will invoke the call to the Microsoft Graph API. It uses the
     // built in Swift libraries to create a connection.
     
@@ -79,30 +109,6 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         }
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        do {
-            // Initialize a MSALPublicClientApplication with a given clientID and authority
-            self.applicationContext = try MSALPublicClientApplication.init(clientId: kClientID, authority: kAuthority)
-        } catch {
-            self.loggingText.text = "Unable to create Application Context. Error: \(error)"
-        }
-    }
-    
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        if self.accessToken.isEmpty {
-            signoutButton.isEnabled = false; 
-        }
-    }
-    
     func getContentWithToken() {
         
         let sessionConfig = URLSessionConfiguration.default
@@ -133,6 +139,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             
             try self.applicationContext.remove(self.applicationContext.users().first)
             self.signoutButton.isEnabled = false;
+            self.loggingText.text = "Logged out"
             
         } catch let error {
             self.loggingText.text = "Received error signing user out: \(error)"

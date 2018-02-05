@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65BA6FBF1FE4312400E32B19 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65BA6FBE1FE4312300E32B19 /* Main.storyboard */; };
 		E222C0E41FC4B79B005854F0 /* MSAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E222C0E31FC4B79B005854F0 /* MSAL.framework */; };
 		E2768ED61FBE126C00619473 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2768ED51FBE126C00619473 /* AppDelegate.swift */; };
 		E2768ED81FBE126C00619473 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2768ED71FBE126C00619473 /* ViewController.swift */; };
-		E2768EDB1FBE126C00619473 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2768ED91FBE126C00619473 /* Main.storyboard */; };
 		E2768EDD1FBE126C00619473 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2768EDC1FBE126C00619473 /* Assets.xcassets */; };
 		E2768EE01FBE126C00619473 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E2768EDE1FBE126C00619473 /* LaunchScreen.storyboard */; };
 		E2768EEB1FBE126C00619473 /* NCC_Kitchen_AssistantTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2768EEA1FBE126C00619473 /* NCC_Kitchen_AssistantTests.swift */; };
@@ -35,11 +35,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		65BA6FBE1FE4312300E32B19 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		E222C0E31FC4B79B005854F0 /* MSAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MSAL.framework; path = Carthage/Build/iOS/MSAL.framework; sourceTree = "<group>"; };
 		E2768ED21FBE126C00619473 /* NCC Kitchen Assistant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NCC Kitchen Assistant.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2768ED51FBE126C00619473 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E2768ED71FBE126C00619473 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		E2768EDA1FBE126C00619473 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		E2768EDC1FBE126C00619473 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E2768EDF1FBE126C00619473 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E2768EE11FBE126C00619473 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -111,7 +111,7 @@
 			children = (
 				E2768ED51FBE126C00619473 /* AppDelegate.swift */,
 				E2768ED71FBE126C00619473 /* ViewController.swift */,
-				E2768ED91FBE126C00619473 /* Main.storyboard */,
+				65BA6FBE1FE4312300E32B19 /* Main.storyboard */,
 				E2768EDC1FBE126C00619473 /* Assets.xcassets */,
 				E2768EDE1FBE126C00619473 /* LaunchScreen.storyboard */,
 				E2768EE11FBE126C00619473 /* Info.plist */,
@@ -206,6 +206,7 @@
 				TargetAttributes = {
 					E2768ED11FBE126C00619473 = {
 						CreatedOnToolsVersion = 8.3.3;
+						DevelopmentTeam = 8SJ9YSKN9X;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 					};
@@ -250,7 +251,7 @@
 			files = (
 				E2768EE01FBE126C00619473 /* LaunchScreen.storyboard in Resources */,
 				E2768EDD1FBE126C00619473 /* Assets.xcassets in Resources */,
-				E2768EDB1FBE126C00619473 /* Main.storyboard in Resources */,
+				65BA6FBF1FE4312400E32B19 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,14 +330,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		E2768ED91FBE126C00619473 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				E2768EDA1FBE126C00619473 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		E2768EDE1FBE126C00619473 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -447,6 +440,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 8SJ9YSKN9X;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
@@ -463,6 +457,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 8SJ9YSKN9X;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/iOS",
