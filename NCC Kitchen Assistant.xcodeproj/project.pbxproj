@@ -10,8 +10,11 @@
 		655E34DB202C1CAE00C31724 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E34DA202C1CAE00C31724 /* Product.swift */; };
 		655E34DD202C209700C31724 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E34DC202C209700C31724 /* Client.swift */; };
 		655E3501202C274200C31724 /* NCC Kitchen Assistent.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 655E34FF202C274200C31724 /* NCC Kitchen Assistent.xcdatamodeld */; };
-		655E3503202C2EB800C31724 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E3502202C2EB800C31724 /* ProductViewController.swift */; };
 		655E3505202C2F0C00C31724 /* ClientViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E3504202C2F0C00C31724 /* ClientViewController.swift */; };
+		655E3507202CEA0400C31724 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E3506202CEA0400C31724 /* MainTableViewController.swift */; };
+		655E3509202CEECD00C31724 /* ClientListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E3508202CEECD00C31724 /* ClientListViewController.swift */; };
+		655E350B202CF3B500C31724 /* ProductListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E350A202CF3B500C31724 /* ProductListViewController.swift */; };
+		655E350D202CF61100C31724 /* ProductViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655E350C202CF61100C31724 /* ProductViewController.swift */; };
 		65BA6FBF1FE4312400E32B19 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65BA6FBE1FE4312300E32B19 /* Main.storyboard */; };
 		E222C0E41FC4B79B005854F0 /* MSAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E222C0E31FC4B79B005854F0 /* MSAL.framework */; };
 		E2768ED61FBE126C00619473 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2768ED51FBE126C00619473 /* AppDelegate.swift */; };
@@ -43,8 +46,11 @@
 		655E34DA202C1CAE00C31724 /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		655E34DC202C209700C31724 /* Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		655E3500202C274200C31724 /* NCC Kitchen Assistent.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "NCC Kitchen Assistent.xcdatamodel"; sourceTree = "<group>"; };
-		655E3502202C2EB800C31724 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
 		655E3504202C2F0C00C31724 /* ClientViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientViewController.swift; sourceTree = "<group>"; };
+		655E3506202CEA0400C31724 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
+		655E3508202CEECD00C31724 /* ClientListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientListViewController.swift; sourceTree = "<group>"; };
+		655E350A202CF3B500C31724 /* ProductListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListViewController.swift; sourceTree = "<group>"; };
+		655E350C202CF61100C31724 /* ProductViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductViewController.swift; sourceTree = "<group>"; };
 		65BA6FBE1FE4312300E32B19 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		E222C0E31FC4B79B005854F0 /* MSAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MSAL.framework; path = Carthage/Build/iOS/MSAL.framework; sourceTree = "<group>"; };
 		E2768ED21FBE126C00619473 /* NCC Kitchen Assistant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "NCC Kitchen Assistant.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,7 +128,10 @@
 				E2768ED51FBE126C00619473 /* AppDelegate.swift */,
 				E2768ED71FBE126C00619473 /* ViewController.swift */,
 				65BA6FBE1FE4312300E32B19 /* Main.storyboard */,
-				655E3502202C2EB800C31724 /* ProductViewController.swift */,
+				655E3506202CEA0400C31724 /* MainTableViewController.swift */,
+				655E350A202CF3B500C31724 /* ProductListViewController.swift */,
+				655E350C202CF61100C31724 /* ProductViewController.swift */,
+				655E3508202CEECD00C31724 /* ClientListViewController.swift */,
 				655E3504202C2F0C00C31724 /* ClientViewController.swift */,
 				655E34DA202C1CAE00C31724 /* Product.swift */,
 				655E34DC202C209700C31724 /* Client.swift */,
@@ -310,10 +319,13 @@
 			files = (
 				E2768ED81FBE126C00619473 /* ViewController.swift in Sources */,
 				655E3505202C2F0C00C31724 /* ClientViewController.swift in Sources */,
+				655E350B202CF3B500C31724 /* ProductListViewController.swift in Sources */,
 				E2768ED61FBE126C00619473 /* AppDelegate.swift in Sources */,
 				655E34DD202C209700C31724 /* Client.swift in Sources */,
+				655E3507202CEA0400C31724 /* MainTableViewController.swift in Sources */,
 				655E3501202C274200C31724 /* NCC Kitchen Assistent.xcdatamodeld in Sources */,
-				655E3503202C2EB800C31724 /* ProductViewController.swift in Sources */,
+				655E3509202CEECD00C31724 /* ClientListViewController.swift in Sources */,
+				655E350D202CF61100C31724 /* ProductViewController.swift in Sources */,
 				655E34DB202C1CAE00C31724 /* Product.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
