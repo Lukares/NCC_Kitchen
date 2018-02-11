@@ -56,7 +56,12 @@ class MainTableViewController: UITableViewController {
         } else if selected == "Products" {
             let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productController") as UIViewController
             self.navigationController?.show(controller, sender: self)
+        } else if selected == "Home" {
+            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "homePage") as! UIViewController
+            splitViewController?.showDetailViewController(controller, sender: nil)
         }
+        
+        
         
         
     }
