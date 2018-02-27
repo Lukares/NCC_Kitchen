@@ -49,7 +49,6 @@ class ProductListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "productCell", for: indexPath)
-        
         cell.textLabel?.text = tempProducts[indexPath.row]
         return cell
     }
@@ -58,9 +57,10 @@ class ProductListViewController: UITableViewController {
         print("selected")
         let selectedProduct = tempProducts[indexPath.row]
 
-        let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productPage") as! ProductViewController
+        let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productRootNav") as! UINavigationController
         splitViewController?.showDetailViewController(controller, sender: nil)
-        controller.productTitleLabel.text = selectedProduct
+        let child = controller.topViewController as! ProductViewController
+        child.recievedTitle = selectedProduct
     }
 }
 

@@ -50,11 +50,12 @@ class ClientListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("selected")
-        let selectedProduct = tempClients[indexPath.row]
+        let selectedClient = tempClients[indexPath.row]
         
-        let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productPage") as! ProductViewController
+        let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientRootNav") as! UINavigationController
         splitViewController?.showDetailViewController(controller, sender: nil)
-        controller.productTitleLabel.text = selectedProduct
+        let child = controller.topViewController as! ClientViewController
+        child.recievedTitle = selectedClient
     }
 
     /*
