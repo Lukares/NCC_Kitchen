@@ -12,7 +12,7 @@ class ClientViewController: UIViewController {
     
     var recievedTitle: String!
     @IBOutlet weak var clientTitleLabel: UILabel!
-    let tempProducts = ["Apple Pie", "Bacon Cheddar Scone", "Lemon Pie"]
+    let tempProducts = ["Apple Pie", "Bacon Cheddar Scone", "Lemon Pie, Banana Nutella Loaf"]
     
     override func viewDidLoad() {
         super.viewDidLoad()

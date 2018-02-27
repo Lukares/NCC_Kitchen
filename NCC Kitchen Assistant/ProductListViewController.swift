@@ -15,7 +15,7 @@ protocol ProductSelectionDelegate: class {
 
 class ProductListViewController: UITableViewController {
     
-    let tempProducts = ["Apple Pie", "Bacon Cheddar Scone", "Lemon Pie"]
+    let tempProducts = ["Apple Pie", "Bacon Cheddar Scone", "Lemon Pie, Banana Nutella Loaf"]
     
     weak var delegate: ProductSelectionDelegate?
     
