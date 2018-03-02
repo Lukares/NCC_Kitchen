@@ -131,10 +131,26 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             }.resume()
     }
     
+    @IBAction func getData(_ sender: Any) {
+        updateExcelData()
+    }
     
     func updateExcelData() {
-        
-        
+        Alamofire.request("http://graph.microsoft.com/v1.0/me/drive/items/964344F42D6061E2!117/workbook/worksheets/{00000000-0001-0000-0000-000000000000}Cell(row=2,column=0)", headers: ["authorization": "Bearer \(accessToken)"]).responseJSON
+            {
+                response in
+                print("Request: \(String(describing: response.request))") //original url request
+                print("Response: \(String(describing: response.response))") //http url response
+                print("Result: \(response.result)")
+                
+                if let json = response.result.value {
+                    print("JSON: \(json)") // serialized json response
+                }
+                
+                if let data = response.data, let utf8Text = String(data: data, encoding: .utf8) {
+                    print("Data: \(utf8Text)")
+                }
+            }
     }
     
     @IBAction func signoutButton(_ sender: UIButton) {
