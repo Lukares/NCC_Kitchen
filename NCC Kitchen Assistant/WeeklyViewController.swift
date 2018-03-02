@@ -10,6 +10,8 @@ import UIKit
 
 class WeeklyViewController: UIViewController {
 
+    let tempProducts = ["Apple Pie", "Bacon Cheddar Scone", "Lemon Pie", "Banana Nutella Loaf"]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -22,14 +24,64 @@ class WeeklyViewController: UIViewController {
     }
     
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "clientPopup" {
+            let vc = segue.destination as! PopupClientController
+            vc.popoverPresentationController?.sourceView = sender as! UIButton
+            vc.delegate = self
+        }
     }
-    */
+}
 
+
+extension WeeklyViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    // MARK: - Table view data source
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        // #warning Incomplete implementation, return the number of sections
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        // #warning Incomplete implementation, return the number of rows
+        return tempProducts.count
+    }
+    
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "weekCell", for: indexPath) as! weekCell
+        
+        cell.productLabel.text = tempProducts[indexPath.row]
+        return cell
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("selected")
+        let selectedProduct = tempProducts[indexPath.row]
+        
+        let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productPage") as! ProductViewController
+        self.navigationController?.show(controller, sender: nil)
+        controller.recievedTitle = selectedProduct
+        tableView.deselectRow(at: indexPath, animated: false)
+    }
+    
+}
+
+
+extension WeeklyViewController: PopupDelegate {
+    func showClient(name: String) {
+        print("Got to delegate")
+        let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientPage") as! ClientViewController
+        self.navigationController?.show(controller, sender: nil)
+        controller.recievedTitle = name
+    }
+    
+    
+    
 }

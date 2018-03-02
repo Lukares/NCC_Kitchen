@@ -1,17 +1,22 @@
 //
-//  MainTableViewController.swift
+//  PopupClientController.swift
 //  NCC Kitchen Assistant
 //
-//  Created by Daniel Fletcher on 2/8/18.
+//  Created by Daniel Fletcher on 2/27/18.
 //  Copyright © 2018 Naturally Curly Cook. All rights reserved.
 //
 
 import UIKit
 
-class MainTableViewController: UITableViewController {
-    
-    let mainOptions = ["Home", "Today", "Weekly View", "Clients", "Products"]
+protocol PopupDelegate {
+    func showClient(name: String)
+}
 
+class PopupClientController: UITableViewController {
+
+    let tempClients = ["Avoca", "Cafe Victoria", "Criswell"]
+    var delegate : PopupDelegate?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -36,43 +41,29 @@ class MainTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return mainOptions.count
+        return tempClients.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
-
-        cell.textLabel?.text = mainOptions[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "clientCell", for: indexPath)
+        cell.textLabel?.text = tempClients[indexPath.row]
         return cell
     }
     
+
+    
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selected = mainOptions[indexPath.row]
-        if selected == "Clients" {
-            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientController") as UIViewController
-            self.navigationController?.show(controller, sender: self)
-        } else if selected == "Products" {
-            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productController") as UIViewController
-            self.navigationController?.show(controller, sender: self)
-        } else if selected == "Home" {
-            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "homePage")
-            splitViewController?.showDetailViewController(controller, sender: nil)
-        }
-        else if selected == "Weekly View" {
-            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "weekRootNav") as! UINavigationController
-            splitViewController?.showDetailViewController(controller, sender: nil)
-        } else if selected == "Today" {
-            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "todayRootNav") as! UINavigationController
-            splitViewController?.showDetailViewController(controller, sender: nil)
-        }
+        print("selected")
+        let selectedClient = tempClients[indexPath.row]
         
-        
-        
-        
+        self.dismiss(animated: true, completion: nil)
+        self.delegate?.showClient(name: selectedClient)
     }
-
+    
+    
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
