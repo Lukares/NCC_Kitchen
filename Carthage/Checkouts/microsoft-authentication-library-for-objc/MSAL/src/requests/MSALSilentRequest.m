@@ -64,7 +64,7 @@
 
 - (void)acquireToken:(MSALCompletionBlock)completionBlock
 {
-    CHECK_ERROR_COMPLETION(_parameters.user, _parameters, MSALErrorInvalidParameter, @"user parameter cannot be nil");
+    CHECK_ERROR_COMPLETION(_parameters.user, _parameters, MSALErrorUserRequired, @"user parameter cannot be nil");
 
     MSALTokenCache *cache = _parameters.tokenCache;
     
@@ -84,7 +84,8 @@
         {
             if (error == nil && !_parameters.unvalidatedAuthority)
             {
-                error = CREATE_LOG_ERROR(_parameters, MSALErrorNoAccessTokensFound, @"Failed to find any access tokens matching user and client ID in cache, and we have no authority to use.");
+                error = CREATE_LOG_ERROR(_parameters, MSALErrorNoAccessTokensFound,
+                                         @"Failed to find any access tokens matching user and client ID in cache, and we have no authority to use.");
             }
             
             if (error)

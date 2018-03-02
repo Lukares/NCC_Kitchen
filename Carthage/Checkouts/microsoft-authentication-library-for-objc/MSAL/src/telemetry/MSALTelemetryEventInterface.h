@@ -32,5 +32,6 @@
 - (void)setStartTime:(NSDate *)time;
 - (void)setStopTime:(NSDate *)time;
 - (void)setResponseTime:(NSTimeInterval)responseTime;
+- (void)deleteProperty:(NSString *)name;
 
 @end

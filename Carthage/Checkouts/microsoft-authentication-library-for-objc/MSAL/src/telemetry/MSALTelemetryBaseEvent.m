@@ -25,6 +25,7 @@
 #import "NSString+MSALHelperMethods.h"
 #import "MSALTelemetryEventStrings.h"
 #import "NSMutableDictionary+MSALExtension.h"
+#import "MSALTelemetryPiiRules.h"
 
 @interface MSALTelemtryBaseEvent ()
 {
@@ -66,7 +67,22 @@
         return;
     }
     
+    if ([MSALTelemetryPiiRules isPii:name])
+    {
+        value = [value msalComputeSHA256Hex];
+    }
+    
     [_propertyMap setValue:value forKey:name];
+}
+
+- (void)deleteProperty:(NSString *)name
+{
+    if ([NSString msalIsStringNilOrBlank:name])
+    {
+        return;
+    }
+    
+    [_propertyMap removeObjectForKey:name];
 }
 
 - (NSDictionary *)getProperties

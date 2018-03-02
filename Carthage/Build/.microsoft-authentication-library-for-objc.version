@@ -2,7 +2,7 @@
   "Mac" : [
     {
       "name" : "MSAL",
-      "hash" : "2150caf294c0ca4e77b441b2169421b7887e78ec73518c790f733d3ac713e6b6"
+      "hash" : "ce61ca7e78cb8d223ad7c7fffad90131dd1c1632ee3f5b34676a0b5ec9b5bd5c"
     }
   ],
   "watchOS" : [
@@ -11,11 +11,11 @@
   "tvOS" : [
 
   ],
-  "commitish" : "cd9e3ea353f134ea779dfd5cc2bd778aebdd26f9",
+  "commitish" : "9b614c32c9afcf5c615632b3f7e7ee924fbfddfa",
   "iOS" : [
     {
       "name" : "MSAL",
-      "hash" : "a80b3238355397a52e45aedc8ecec18b9b71780579ecfd716402ad143e6235c6"
+      "hash" : "e368863f1fd3a202d6a75cba22c9f68d432da2e939e984c12e0e6b4408415d04"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import UIKit
 import MSAL
+import Alamofire
 
 class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate {
     
@@ -128,6 +129,12 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                 self.loggingText.text = result.debugDescription
             }
             }.resume()
+    }
+    
+    
+    func updateExcelData() {
+        
+        
     }
     
     @IBAction func signoutButton(_ sender: UIButton) {

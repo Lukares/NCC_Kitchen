@@ -1,1 +1,2 @@
 github "AzureAD/microsoft-authentication-library-for-objc" "master"
+github "Alamofire/Alamofire" ~> 4.6

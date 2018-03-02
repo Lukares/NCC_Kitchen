@@ -75,6 +75,12 @@ typedef void (^MSALTestHttpCompletionBlock)(NSData *data, NSURLResponse *respons
                                     query:(NSString *)query
                                    scopes:(MSALScopes *)scopes;
 
++ (MSALTestURLResponse *)authCodeResponse:(NSString *)authcode
+                                authority:(NSString *)authority
+                                    query:(NSString *)query
+                                   scopes:(MSALScopes *)scopes
+                               clientInfo:(NSDictionary *)clientInfo;
+
 + (MSALTestURLResponse *)rtResponseForScopes:(MSALScopes *)scopes
                                    authority:(NSString *)authority
                                     tenantId:(NSString *)tid
@@ -105,5 +111,8 @@ typedef void (^MSALTestHttpCompletionBlock)(NSData *data, NSURLResponse *respons
 
 // Helper dispatch method that URLSessionTask can utilize
 - (void)dispatchIfNeed:(void (^)(void))block;
+
+// Helper method to clear out response
++ (void)reset;
 
 @end

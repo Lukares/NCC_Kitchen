@@ -27,6 +27,7 @@
 
 #import "MSALAutoRequestViewController.h"
 #import "MSALAutoSettings.h"
+#import "MSALAutomationConstants.h"
 
 @interface MSALAutoRequestViewController ()
 
@@ -62,7 +63,7 @@
     {
         NSString *errorString = [NSString stringWithFormat:@"Error Domain=%@ Code=%ld Description=%@", error.domain, (long)error.code, error.localizedDescription];
         
-        params = @{ @"error" : errorString };
+        params = @{ MSAL_AUTOMATION_ERROR_PARAM : errorString };
     }
     
     self.completionBlock(params);

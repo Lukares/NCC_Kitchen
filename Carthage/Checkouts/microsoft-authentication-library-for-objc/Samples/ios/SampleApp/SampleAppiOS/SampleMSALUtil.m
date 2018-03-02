@@ -53,13 +53,22 @@
 {
     [[MSALLogger sharedLogger] setCallback:^(MSALLogLevel level, NSString *message, BOOL containsPII)
     {
-        // When capturing log messages from MSAL you only need to capture either messages where
-        // containsPII == YES or containsPII == NO, as log messages are duplicated between the
-        // two, however the containsPII version might contain Personally Identifiable Information (PII)
+        // If PiiLoggingEnabled is set YES, this block will be called twice; containsPII == YES and
+        // containsPII == NO. In this case, you only need to capture either one set of messages.
+        // however the containsPII version might contain Personally Identifiable Information (PII)
         // about the user being logged in.
+        
+        // if message is "redirect to https://somehost.com",
         if (!containsPII)
         {
+            // WILL CONTAIN EVERYTHING
+            // so message contains "redirect to https://somehost.com"
             NSLog(@"%@", message);
+        }
+        
+        else
+        {
+            // message contains "redirect to unknown host" or "redirect to (non-nil)"
         }
     }];
 }
