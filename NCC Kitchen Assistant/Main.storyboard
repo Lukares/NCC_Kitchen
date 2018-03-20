@@ -268,7 +268,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="basicCell" textLabel="hud-WF-JwU" style="IBUITableViewCellStyleDefault" id="9p8-bj-rRX">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="basicCell" textLabel="hud-WF-JwU" imageView="w94-4v-AYK" style="IBUITableViewCellStyleDefault" id="9p8-bj-rRX">
                                 <rect key="frame" x="0.0" y="28" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="9p8-bj-rRX" id="JBg-kY-vVM">
@@ -276,12 +276,16 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="hud-WF-JwU">
-                                            <rect key="frame" x="16" y="0.0" width="288" height="43.5"/>
+                                            <rect key="frame" x="75" y="0.0" width="229" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                             <nil key="textColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" image="home" id="w94-4v-AYK">
+                                            <rect key="frame" x="16" y="0.0" width="44" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </imageView>
                                     </subviews>
                                 </tableViewCellContentView>
                             </tableViewCell>
@@ -419,6 +423,7 @@
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="tintColor" red="0.60263204569999995" green="0.78122925759999995" blue="0.48659405109999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
                             <constraint firstItem="kJO-Ne-rpA" firstAttribute="leading" secondItem="QPB-xz-AOK" secondAttribute="leading" constant="208" id="CuM-bz-vkr"/>
                             <constraint firstItem="rSz-1f-gSF" firstAttribute="bottom" secondItem="QPB-xz-AOK" secondAttribute="bottom" id="E3G-V6-8ZP"/>
@@ -618,7 +623,7 @@
                                         </constraints>
                                     </stackView>
                                 </subviews>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.60263204569999995" green="0.78122925759999995" blue="0.48659405109999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="1Lo-2W-iw8"/>
                                     <constraint firstAttribute="bottom" secondItem="gVI-8a-GaR" secondAttribute="bottom" id="1O5-VX-QAi"/>
@@ -842,7 +847,7 @@
                                         </subviews>
                                     </stackView>
                                 </subviews>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="0.60263204574584961" green="0.78122925758361816" blue="0.48659405112266541" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="d8h-5t-u6J" secondAttribute="trailing" id="PC1-4x-1UZ"/>
                                     <constraint firstItem="d8h-5t-u6J" firstAttribute="top" secondItem="4PR-4A-8Pn" secondAttribute="top" id="Svj-2N-yuB"/>
@@ -886,6 +891,20 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <tabBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="V3j-sc-CFI">
+                                <rect key="frame" x="0.0" y="785" width="1112" height="49"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <items>
+                                    <tabBarItem title="Sunday" largeContentSizeImage="today" id="md7-jg-9Yd"/>
+                                    <tabBarItem title="Monday" id="36J-qr-MYH"/>
+                                    <tabBarItem title="Tuesday" id="yfq-qd-QJn"/>
+                                    <tabBarItem title="Wednesday" id="iag-e3-9nt"/>
+                                    <tabBarItem title="Thursday" id="auE-oh-0GV"/>
+                                    <tabBarItem title="Friday" id="gG3-lF-loP"/>
+                                    <tabBarItem title="Saturday" id="IYl-uT-NZh"/>
+                                </items>
+                            </tabBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -897,6 +916,7 @@
                     <navigationItem key="navigationItem" id="Hcf-sF-D9t"/>
                     <connections>
                         <outlet property="dateLabel" destination="DB1-mq-zm3" id="rDv-20-2SM"/>
+                        <outlet property="daySelector" destination="V3j-sc-CFI" id="W2i-uV-nl1"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CfP-by-KYB" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1050,6 +1070,10 @@
             <point key="canvasLocation" x="-2824" y="1508"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="home" width="333" height="333"/>
+        <image name="today" width="333" height="333"/>
+    </resources>
     <inferredMetricsTieBreakers>
         <segue reference="q9z-7G-7qf"/>
     </inferredMetricsTieBreakers>

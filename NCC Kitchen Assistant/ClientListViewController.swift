@@ -20,6 +20,11 @@ class ClientListViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        let icon = UIImage(named: "clients.png")
+        let imageView = UIImageView(image:icon)
+        imageView.contentMode = .scaleAspectFit
+        self.navigationItem.titleView = imageView
     }
 
     override func didReceiveMemoryWarning() {

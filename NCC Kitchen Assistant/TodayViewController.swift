@@ -10,6 +10,7 @@ import UIKit
 
 class TodayViewController: UIViewController {
 
+    @IBOutlet weak var daySelector: UITabBar!
     @IBOutlet weak var dateLabel: UILabel!
     var dayOfWeek = ""
     
@@ -18,6 +19,11 @@ class TodayViewController: UIViewController {
         
         dayOfWeek = getDayStr(day: Date())
         dateLabel.text = "Today is " + dayOfWeek + "!"
+        for dayTab in daySelector.items! {
+            if dayTab.title == dayOfWeek {
+                daySelector.selectedItem = dayTab
+            }
+        }
         
     }
 

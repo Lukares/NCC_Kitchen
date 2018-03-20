@@ -8,9 +8,10 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     let kAuthority = "https://login.microsoftonline.com/common/v2.0"
     
     let kGraphURI = "https://graph.microsoft.com/v1.0/me/"
-    let kScopes: [String] = ["https://graph.microsoft.com/user.read"]
+    let kScopes: [String] = ["https://graph.microsoft.com/user.read", "https://graph.microsoft.com/files.readwrite.all"]
     
     var accessToken = String()
+    var refreshToken = String()
     var applicationContext = MSALPublicClientApplication.init()
     
     @IBOutlet weak var loggingText: UITextView!
@@ -69,9 +70,8 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                         self.accessToken = (result?.accessToken)!
                         self.loggingText.text = "Refreshing token silently)"
                         self.loggingText.text = "Refreshed Access token is \(self.accessToken)"
-                        
                         self.signoutButton.isEnabled = true;
-                        self.getContentWithToken()
+                        self.getContentWithToken(self.kGraphURI)
                         
                     } else {
                         self.loggingText.text = "Could not acquire token silently: \(error ?? "No error information" as! Error)"
@@ -92,7 +92,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                         self.accessToken = (result?.accessToken)!
                         self.loggingText.text = "Access token is \(self.accessToken)"
                         self.signoutButton.isEnabled = true;
-                        self.getContentWithToken()
+                        self.getContentWithToken(self.kGraphURI)
                         
                     } else  {
                         self.loggingText.text = "Could not acquire token: \(error ?? "No error information" as! Error)"
@@ -110,23 +110,23 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         }
     }
     
-    func getContentWithToken() {
+    func getContentWithToken(_ api_call: String) {
         
         let sessionConfig = URLSessionConfiguration.default
         
         // Specify the Graph API endpoint
-        let url = URL(string: kGraphURI)
+        let url = URL(string: api_call)
         var request = URLRequest(url: url!)
         
         // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
-        request.setValue("Bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
         let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
         
         urlSession.dataTask(with: request) { data, response, error in
             let result = try? JSONSerialization.jsonObject(with: data!, options: [])
             if result != nil {
                 
-                self.loggingText.text = result.debugDescription
+                print(result.debugDescription)
             }
             }.resume()
     }
@@ -136,21 +136,24 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     }
     
     func updateExcelData() {
-        Alamofire.request("http://graph.microsoft.com/v1.0/me/drive/items/964344F42D6061E2!117/workbook/worksheets/{00000000-0001-0000-0000-000000000000}Cell(row=2,column=0)", headers: ["authorization": "Bearer \(accessToken)"]).responseJSON
-            {
-                response in
-                print("Request: \(String(describing: response.request))") //original url request
-                print("Response: \(String(describing: response.response))") //http url response
-                print("Result: \(response.result)")
-                
-                if let json = response.result.value {
-                    print("JSON: \(json)") // serialized json response
-                }
-                
-                if let data = response.data, let utf8Text = String(data: data, encoding: .utf8) {
-                    print("Data: \(utf8Text)")
-                }
+
+        let sessionConfig = URLSessionConfiguration.default
+
+        // Specify the Graph API endpoint
+        let url = URL(string: kGraphURI + "/drive/root/search(q='.xls')?select=name,id,webUrl")
+        var request = URLRequest(url: url!)
+
+        // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
+        request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
+        let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
+
+        urlSession.dataTask(with: request) { data, response, error in
+            let result = try? JSONSerialization.jsonObject(with: data!, options: [])
+            if result != nil {
+
+                print(result.debugDescription)
             }
+        }.resume()
     }
     
     @IBAction func signoutButton(_ sender: UIButton) {

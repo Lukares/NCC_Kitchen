@@ -42,8 +42,25 @@ class MainTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
-
-        cell.textLabel?.text = mainOptions[indexPath.row]
+        let cellTitle = mainOptions[indexPath.row]
+        cell.textLabel?.text = cellTitle
+        var imageTitle = ""
+        switch cellTitle {
+        case "Home":
+            imageTitle = "home.png"
+        case "Today":
+            imageTitle = "today.png"
+        case "Weekly View":
+            imageTitle = "week.png"
+        case "Clients":
+            imageTitle = "clients.png"
+        case "Products":
+            imageTitle = "pie.png"
+        default:
+            imageTitle = "home.png"
+        }
+        
+        cell.imageView?.image = UIImage(named: imageTitle)
         return cell
     }
     
