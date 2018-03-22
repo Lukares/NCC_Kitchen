@@ -1,4 +1,6 @@
 import UIKit
+import CoreData
+import SwiftyJSON
 import MSAL
 import Alamofire
 
@@ -10,10 +12,15 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     let kGraphURI = "https://graph.microsoft.com/v1.0/me/"
     let kScopes: [String] = ["https://graph.microsoft.com/user.read", "https://graph.microsoft.com/files.readwrite.all"]
     
+    let kDocumentID = ""
+    
     var accessToken = String()
     var refreshToken = String()
     var applicationContext = MSALPublicClientApplication.init()
     
+    var docList:[(name: String, id: String)] = []
+    
+    @IBOutlet weak var docPicker: UIPickerView!
     @IBOutlet weak var loggingText: UITextView!
     @IBOutlet weak var signoutButton: UIButton!
     
@@ -50,8 +57,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     // This button will invoke the call to the Microsoft Graph API. It uses the
     // built in Swift libraries to create a connection.
     
-    @IBAction func callGraphButton(_ sender: UIButton) {
-        
+    @IBAction func loginButton(_ sender: UIButton) {
         
         do {
             
@@ -72,6 +78,23 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                         self.loggingText.text = "Refreshed Access token is \(self.accessToken)"
                         self.signoutButton.isEnabled = true;
                         self.getContentWithToken(self.kGraphURI)
+                        
+                        self.makeRequest(self.kGraphURI + "/drive/root/search(q='.xls')?select=name,id,webUrl") { jsonResult in
+//                            print("List of files \n\n"+result.debugDescription)
+                            
+                            for obj in jsonResult["value"] {
+                                print("HELLO THERE\n\n\n\(obj.1["name"]) \(obj.1["id"])")
+                                let name = obj.1["name"].string!
+                                let id = obj.1["id"].string!
+                                
+                                self.docList.append((name, id))
+                            }
+                            
+                            // do something with the returned Bool
+                            DispatchQueue.main.async {
+                                self.docPicker.reloadAllComponents()
+                            }
+                        }
                         
                     } else {
                         self.loggingText.text = "Could not acquire token silently: \(error ?? "No error information" as! Error)"
@@ -106,8 +129,8 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             // This is the catch all error.
             
             self.loggingText.text = "Unable to acquire token. Got error: \(error)"
-            
         }
+        
     }
     
     func getContentWithToken(_ api_call: String) {
@@ -131,30 +154,57 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             }.resume()
     }
     
-    @IBAction func getData(_ sender: Any) {
-        updateExcelData()
+    @IBAction func testButton(_ sender: Any) {
+        
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        let managedContext = appDelegate?.persistentContainer.viewContext
+        
+        let fetchProductRequest =  NSFetchRequest<NSManagedObject>(entityName: "Product")
+        let fetchClientRequest =  NSFetchRequest<NSManagedObject>(entityName: "Client")
+        
+        var pt = [NSManagedObject]()
+        var ct = [NSManagedObject]()
+        do {
+            pt = (try managedContext?.fetch(fetchProductRequest))!
+            ct = (try managedContext?.fetch(fetchClientRequest))!
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+        print("Products from Core Data")
+        for p in pt {
+            print(p.value(forKeyPath: "name") as! String)
+        }
+        print("Clients from Core Data")
+        for c in ct {
+            print(c.value(forKeyPath: "name") as! String)
+        }
+        
     }
     
-    func updateExcelData() {
+    
+    
+    
+    func makeRequest(_ urlString: String, completion: @escaping (JSON)->() ) {
 
         let sessionConfig = URLSessionConfiguration.default
 
         // Specify the Graph API endpoint
-        let url = URL(string: kGraphURI + "/drive/root/search(q='.xls')?select=name,id,webUrl")
+        let url = URL(string: urlString)
+
         var request = URLRequest(url: url!)
 
         // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
         request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
         let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
 
+        var result = [String:Any]()
         urlSession.dataTask(with: request) { data, response, error in
-            let result = try? JSONSerialization.jsonObject(with: data!, options: [])
-            if result != nil {
-
-                print(result.debugDescription)
-            }
+            let json = try! JSON(data: data!)
+            completion(json)
         }.resume()
     }
+        
+    
     
     @IBAction func signoutButton(_ sender: UIButton) {
         
@@ -171,5 +221,119 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             self.loggingText.text = "Received error signing user out: \(error)"
         }
     }
+    
+    
+    @IBAction func selectDocument(_ sender: Any) {
+        let id = docList[docPicker.selectedRow(inComponent: 0)].id
+        print("Selected ID" + id)
+        
+        var productList:[String] = []
+        var clientList:[String] = []
+        
+        makeRequest(kGraphURI + "drive/items/\(id)/workbook/worksheets", completion: { jsonResult in
+            // do something with the returned json
+            for obj in jsonResult["value"] {
+                print("Worksheet named \(obj.1["name"])")
+        
+                //Get list of products from Weekly Orders by Product sheet
+        /*        if obj.1["name"].string == "Weekly Orders by Product" {
+                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Weekly%20Orders%20by%20Product')/usedRange", completion: { worksheetData in
+                        // do something with the returned json
+                        
+                        print("\n\nList of products:\n")
+                        var i = 1
+                        while worksheetData["formulas"][i][11].string!.count > 0 {
+                            print(worksheetData["formulas"][i][11].string!)
+                            i += 1
+                        }
+                        
+                        DispatchQueue.main.async {
+                            // update UI
+                        }
+                    })
+                }
+        */
+                
+                
+                let appDelegate = UIApplication.shared.delegate as? AppDelegate
+                let managedContext = appDelegate?.persistentContainer.viewContext
+                let prodEntity = NSEntityDescription.entity(forEntityName: "Product", in: managedContext!)!
+                let clientEntity = NSEntityDescription.entity(forEntityName: "Client", in: managedContext!)!
+                
+                
+                //Get list of clients & Products from Customer sheet
+                if obj.1["name"].string == "Weekly Orders" {
+                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Weekly%20Orders')/usedRange", completion: { worksheetData in
+                        // do something with the returned json
+                        
+//                        print("\n\nList of Clients:\n")
+                        var i = 1
+                        while worksheetData["formulas"][i][0].string!.count > 0 {
+                            let prod = worksheetData["formulas"][i][0].string!
+                            let client = worksheetData["formulas"][i][8].string!
+                            if !productList.contains(prod) {
+                                productList.append(prod)
+                                let tempProd = NSManagedObject(entity: prodEntity, insertInto: managedContext)
+                                tempProd.setValue(prod, forKeyPath: "name")
+                            }
+                            if !clientList.contains(client) {
+                                clientList.append(client)
+                                let tempClient = NSManagedObject(entity: clientEntity, insertInto: managedContext)
+                                tempClient.setValue(client, forKeyPath: "name")
+                            }
+                            i += 1
+                        }
+                        
+                        print("Product list:\n\(productList)\n")
+                        print("Client list:\n\(clientList)\n")
+
+                        do {
+                            try managedContext?.save()
+                            print("Saved to Core Data")
+                        } catch let error as NSError {
+                            print("Could not save. \(error), \(error.userInfo)")
+                        }
+                        
+                        DispatchQueue.main.async {
+                            // update UI
+                        }
+                    })
+                }
+                
+            }
+            
+            
+            DispatchQueue.main.async {
+                // update UI
+            }
+            
+            
+        })
+        
+    }
+    
+    
+    
+}
+
+
+func saveToCoreData(products: [String] ) {
+    
+}
+
+extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+         return docList.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return docList[row].name
+    }
+    
+    
 }
 

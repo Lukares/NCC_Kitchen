@@ -383,7 +383,7 @@
                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="30"/>
                                 <state key="normal" title="Login to Excel Online"/>
                                 <connections>
-                                    <action selector="callGraphButton:" destination="SP7-kE-VIb" eventType="touchUpInside" id="8Ew-SK-klE"/>
+                                    <action selector="loginButton:" destination="SP7-kE-VIb" eventType="touchUpInside" id="8Ew-SK-klE"/>
                                 </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Good Morning Kelly, today is a great day for baking!" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="kJO-Ne-rpA">
@@ -418,13 +418,33 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Test"/>
                                 <connections>
-                                    <action selector="getData:" destination="SP7-kE-VIb" eventType="touchUpInside" id="qho-MQ-Hbb"/>
+                                    <action selector="testButton:" destination="SP7-kE-VIb" eventType="touchUpInside" id="qho-MQ-Hbb"/>
+                                </connections>
+                            </button>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zqh-3s-6AR">
+                                <rect key="frame" x="463" y="106" width="320" height="155"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="155" id="BYR-HZ-fw0"/>
+                                </constraints>
+                                <connections>
+                                    <outlet property="dataSource" destination="SP7-kE-VIb" id="G0Y-aa-OQ5"/>
+                                    <outlet property="delegate" destination="SP7-kE-VIb" id="rfj-Yc-Gxx"/>
+                                </connections>
+                            </pickerView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7eq-Cu-Ufg">
+                                <rect key="frame" x="605" y="269" width="72" height="36"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="SELECT"/>
+                                <connections>
+                                    <action selector="selectDocument:" destination="SP7-kE-VIb" eventType="touchUpInside" id="yR2-2t-gVa"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="tintColor" red="0.60263204569999995" green="0.78122925759999995" blue="0.48659405109999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                         <constraints>
+                            <constraint firstItem="Zqh-3s-6AR" firstAttribute="top" secondItem="kU4-jZ-B1h" secondAttribute="bottom" constant="8" id="428-SM-hof"/>
                             <constraint firstItem="kJO-Ne-rpA" firstAttribute="leading" secondItem="QPB-xz-AOK" secondAttribute="leading" constant="208" id="CuM-bz-vkr"/>
                             <constraint firstItem="rSz-1f-gSF" firstAttribute="bottom" secondItem="QPB-xz-AOK" secondAttribute="bottom" id="E3G-V6-8ZP"/>
                             <constraint firstItem="kJO-Ne-rpA" firstAttribute="top" secondItem="fU6-Y9-gyt" secondAttribute="bottom" constant="242" id="GFD-bD-rfD"/>
@@ -434,11 +454,13 @@
                             <constraint firstItem="QPB-xz-AOK" firstAttribute="trailing" secondItem="kU4-jZ-B1h" secondAttribute="trailing" constant="92" id="XE4-rr-2cl"/>
                             <constraint firstItem="fU6-Y9-gyt" firstAttribute="top" secondItem="58q-Yd-nsu" secondAttribute="topMargin" id="bHt-3f-J3o"/>
                             <constraint firstItem="kJO-Ne-rpA" firstAttribute="centerY" secondItem="58q-Yd-nsu" secondAttribute="centerY" id="mCY-RC-4Gr"/>
+                            <constraint firstItem="QPB-xz-AOK" firstAttribute="trailing" secondItem="Zqh-3s-6AR" secondAttribute="trailing" constant="8.5" id="qsE-74-FeU"/>
                             <constraint firstItem="QPB-xz-AOK" firstAttribute="trailing" secondItem="rSz-1f-gSF" secondAttribute="trailing" id="uK4-ML-ieU"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="QPB-xz-AOK"/>
                     </view>
                     <connections>
+                        <outlet property="docPicker" destination="Zqh-3s-6AR" id="Rti-RT-eVV"/>
                         <outlet property="loggingText" destination="rSz-1f-gSF" id="4oD-k6-0Bd"/>
                         <outlet property="signoutButton" destination="kU4-jZ-B1h" id="ZdQ-eV-ddz"/>
                     </connections>
