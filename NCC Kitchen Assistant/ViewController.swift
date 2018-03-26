@@ -4,6 +4,8 @@ import SwiftyJSON
 import MSAL
 import Alamofire
 
+var controllerSet = [String: UIViewController]()
+
 class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate {
     
     let kClientID = "a43b5ef7-6217-4310-911f-6eb26d15ca1c"
@@ -18,8 +20,11 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     var refreshToken = String()
     var applicationContext = MSALPublicClientApplication.init()
     
+    let defaults = UserDefaults.standard
+    
     var docList:[(name: String, id: String)] = []
     
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var docPicker: UIPickerView!
     @IBOutlet weak var loggingText: UITextView!
     @IBOutlet weak var signoutButton: UIButton!
@@ -77,7 +82,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                         self.loggingText.text = "Refreshing token silently)"
                         self.loggingText.text = "Refreshed Access token is \(self.accessToken)"
                         self.signoutButton.isEnabled = true;
-                        self.getContentWithToken(self.kGraphURI)
+//                        self.getContentWithToken(self.kGraphURI)
                         
                         self.makeRequest(self.kGraphURI + "/drive/root/search(q='.xls')?select=name,id,webUrl") { jsonResult in
 //                            print("List of files \n\n"+result.debugDescription)
@@ -115,7 +120,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                         self.accessToken = (result?.accessToken)!
                         self.loggingText.text = "Access token is \(self.accessToken)"
                         self.signoutButton.isEnabled = true;
-                        self.getContentWithToken(self.kGraphURI)
+//                        self.getContentWithToken(self.kGraphURI)
                         
                     } else  {
                         self.loggingText.text = "Could not acquire token: \(error ?? "No error information" as! Error)"
@@ -133,51 +138,50 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         
     }
     
-    func getContentWithToken(_ api_call: String) {
-        
-        let sessionConfig = URLSessionConfiguration.default
-        
-        // Specify the Graph API endpoint
-        let url = URL(string: api_call)
-        var request = URLRequest(url: url!)
-        
-        // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
-        request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
-        let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
-        
-        urlSession.dataTask(with: request) { data, response, error in
-            let result = try? JSONSerialization.jsonObject(with: data!, options: [])
-            if result != nil {
-                
-                print(result.debugDescription)
-            }
-            }.resume()
-    }
+//    func getContentWithToken(_ api_call: String) {
+//
+//        let sessionConfig = URLSessionConfiguration.default
+//
+//        // Specify the Graph API endpoint
+//        let url = URL(string: api_call)
+//        var request = URLRequest(url: url!)
+//
+//        // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
+//        request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
+//        let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
+//
+//        urlSession.dataTask(with: request) { data, response, error in
+//            let result = try? JSONSerialization.jsonObject(with: data!, options: [])
+//            if result != nil {
+//
+//                print(result.debugDescription)
+//            }
+//            }.resume()
+//    }
+//
+    
+    
     
     @IBAction func testButton(_ sender: Any) {
         
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         let managedContext = appDelegate?.persistentContainer.viewContext
         
-        let fetchProductRequest =  NSFetchRequest<NSManagedObject>(entityName: "Product")
-        let fetchClientRequest =  NSFetchRequest<NSManagedObject>(entityName: "Client")
+        let fetchOrderRequest =  NSFetchRequest<NSManagedObject>(entityName: "Order")
         
-        var pt = [NSManagedObject]()
-        var ct = [NSManagedObject]()
+        var ot = [NSManagedObject]()
         do {
-            pt = (try managedContext?.fetch(fetchProductRequest))!
-            ct = (try managedContext?.fetch(fetchClientRequest))!
+            ot = (try managedContext?.fetch(fetchOrderRequest))!
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
-        print("Products from Core Data")
-        for p in pt {
-            print(p.value(forKeyPath: "name") as! String)
+        print("Orders from Core Data")
+        for o in ot {
+            let ord = o as! Order
+            print("Order: Client = \(ord.orderingClient?.name); Product = \(ord.productType?.name)")
+//            print(o.value(forKeyPath: "orderingClient") as! String)
         }
-        print("Clients from Core Data")
-        for c in ct {
-            print(c.value(forKeyPath: "name") as! String)
-        }
+        
         
     }
     
@@ -197,7 +201,6 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
         let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
 
-        var result = [String:Any]()
         urlSession.dataTask(with: request) { data, response, error in
             let json = try! JSON(data: data!)
             completion(json)
@@ -224,102 +227,156 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     
     
     @IBAction func selectDocument(_ sender: Any) {
+        activityIndicator.startAnimating()
         let id = docList[docPicker.selectedRow(inComponent: 0)].id
-        print("Selected ID" + id)
+        print("Selected ID: " + id)
         
-        var productList:[String] = []
-        var clientList:[String] = []
+        var productList:[Product] = []
+        var clientList:[Client] = []
+        
+        
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        let managedContext = appDelegate?.persistentContainer.viewContext
+//        let prodEntity = NSEntityDescription.entity(forEntityName: "Product", in: managedContext!)!
+//        let clientEntity = NSEntityDescription.entity(forEntityName: "Client", in: managedContext!)!
+        
         
         makeRequest(kGraphURI + "drive/items/\(id)/workbook/worksheets", completion: { jsonResult in
             // do something with the returned json
             for obj in jsonResult["value"] {
                 print("Worksheet named \(obj.1["name"])")
         
-                //Get list of products from Weekly Orders by Product sheet
-        /*        if obj.1["name"].string == "Weekly Orders by Product" {
-                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Weekly%20Orders%20by%20Product')/usedRange", completion: { worksheetData in
+                //Collecting client data
+                if obj.1["name"].string == "Customer" {
+                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Customer')/usedRange", completion: { worksheetData in
                         // do something with the returned json
                         
                         print("\n\nList of products:\n")
                         var i = 1
-                        while worksheetData["formulas"][i][11].string!.count > 0 {
-                            print(worksheetData["formulas"][i][11].string!)
+                        while worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0 {
+                            
+//                            let tempClient:Client = Client()
+                            let tempClient = NSEntityDescription.insertNewObject(forEntityName: "Client", into: managedContext!) as! Client
+                            
+                            tempClient.name = worksheetData["formulas"][i][0].string!
+                            tempClient.address = worksheetData["formulas"][i][1].string! + " " + worksheetData["formulas"][i][2].string!
+//                            managedContext?.insert(tempClient)
+                            clientList.append(tempClient)
                             i += 1
                         }
                         
-                        DispatchQueue.main.async {
-                            // update UI
+                    })
+                }
+                
+                //Get list of products from Product sheet
+                else if obj.1["name"].string == "Products" {
+                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Products')/usedRange", completion: { worksheetData in
+                        // do something with the returned json
+                        
+//                        print("\n\nList of products:\n")
+                        var i = 1
+                        while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
+                            
+                            let tempProd = NSEntityDescription.insertNewObject(forEntityName: "Product", into: managedContext!) as! Product
+                            tempProd.name = worksheetData["formulas"][i][0].string!
+                            if let price = worksheetData["formulas"][i][4].double {
+                                tempProd.price = price
+                            } else { tempProd.price = 0}
+                            productList.append(tempProd)
+//                            managedContext?.insert(tempProd)
+                            i += 1
                         }
                     })
                 }
-        */
-                
-                
-                let appDelegate = UIApplication.shared.delegate as? AppDelegate
-                let managedContext = appDelegate?.persistentContainer.viewContext
-                let prodEntity = NSEntityDescription.entity(forEntityName: "Product", in: managedContext!)!
-                let clientEntity = NSEntityDescription.entity(forEntityName: "Client", in: managedContext!)!
-                
-                
-                //Get list of clients & Products from Customer sheet
-                if obj.1["name"].string == "Weekly Orders" {
+                    
+                    //Get product details from Weekly orders
+                else if obj.1["name"].string == "Weekly Orders" {
                     self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Weekly%20Orders')/usedRange", completion: { worksheetData in
                         // do something with the returned json
                         
-//                        print("\n\nList of Clients:\n")
                         var i = 1
-                        while worksheetData["formulas"][i][0].string!.count > 0 {
-                            let prod = worksheetData["formulas"][i][0].string!
-                            let client = worksheetData["formulas"][i][8].string!
-                            if !productList.contains(prod) {
-                                productList.append(prod)
-                                let tempProd = NSManagedObject(entity: prodEntity, insertInto: managedContext)
-                                tempProd.setValue(prod, forKeyPath: "name")
+                        while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
+                            
+                            let prodName = worksheetData["formulas"][i][0].string!
+                            let orderingClient = worksheetData["formulas"][i][8].string!
+                            
+                            print("Found order in excel: Product = \"\(prodName)\"; Client = \"\(orderingClient)\"")
+                            
+                            for thisProduct in productList {
+                                print("Searching for existing product in ProductList: " + thisProduct.name!)
+                                
+                                if thisProduct.name == prodName {
+                                    print("Found matching product")
+                                    if let cat = worksheetData["formulas"][i][9].int16 {
+                                        thisProduct.catagory = cat
+                                    } else {thisProduct.catagory = 0}
+                                    for thisClient in clientList {
+                                        print("Searching for existing client in ClientList: " + thisClient.name!)
+                                        if thisClient.name == orderingClient { // Found Client/Product pair
+                                            print("Found matching client")
+                                            let tempOrder = NSEntityDescription.insertNewObject(forEntityName: "Order", into: managedContext!) as! Order
+                                            tempOrder.productType = thisProduct
+                                            tempOrder.orderingClient = thisClient
+                                            if let mon = worksheetData["formulas"][i][1].int16 {
+                                                tempOrder.monday = mon
+                                            } else { tempOrder.monday = 0 }
+                                            
+                                            if let tues = worksheetData["formulas"][i][2].int16 {
+                                                tempOrder.tuesday = tues
+                                            } else { tempOrder.tuesday = 0 }
+                                            
+                                            if let wed = worksheetData["formulas"][i][3].int16 {
+                                                tempOrder.wednesday = wed
+                                            } else { tempOrder.wednesday = 0 }
+                                            
+                                            if let thur = worksheetData["formulas"][i][4].int16 {
+                                                tempOrder.thursday = thur
+                                            } else { tempOrder.thursday = 0 }
+                                            
+                                            if let fri = worksheetData["formulas"][i][5].int16 {
+                                                tempOrder.friday = fri
+                                            } else { tempOrder.friday = 0 }
+                                            
+                                            if let sat = worksheetData["formulas"][i][6].int16 {
+                                                tempOrder.saturday = sat
+                                            } else { tempOrder.saturday = 0 }
+                                            
+                                            if let sun = worksheetData["formulas"][i][7].int16 {
+                                                tempOrder.sunday = sun
+                                            } else { tempOrder.sunday = 0 }
+                                            
+                                            break //Break out of client search loop
+                                        }
+                                    }
+                                    break //Break out of product search loop
+                                }
+                                
+//                                managedContext?.insert(tempOrder)
+                                
                             }
-                            if !clientList.contains(client) {
-                                clientList.append(client)
-                                let tempClient = NSManagedObject(entity: clientEntity, insertInto: managedContext)
-                                tempClient.setValue(client, forKeyPath: "name")
-                            }
+                            
                             i += 1
-                        }
-                        
-                        print("Product list:\n\(productList)\n")
-                        print("Client list:\n\(clientList)\n")
-
-                        do {
-                            try managedContext?.save()
-                            print("Saved to Core Data")
-                        } catch let error as NSError {
-                            print("Could not save. \(error), \(error.userInfo)")
                         }
                         
                         DispatchQueue.main.async {
                             // update UI
+                            do { // Saved to Core Data
+                                try managedContext?.save()
+                                self.defaults.set(Date(), forKey: "lastUpdate")
+                                self.activityIndicator.stopAnimating()
+                                print("Saved to Core Data")
+                            } catch let error as NSError {
+                                print("Could not save. \(error), \(error.userInfo)")
+                            }
                         }
                     })
                 }
-                
             }
             
-            
-            DispatchQueue.main.async {
-                // update UI
-            }
-            
-            
-        })
-        
+        }) // End of get worksheet names
     }
-    
-    
-    
 }
 
-
-func saveToCoreData(products: [String] ) {
-    
-}
 
 extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int {

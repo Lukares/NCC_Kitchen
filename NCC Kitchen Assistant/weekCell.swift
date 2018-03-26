@@ -11,6 +11,8 @@ import UIKit
 class weekCell: UITableViewCell {
 
     @IBOutlet weak var productLabel: UILabel!
+    @IBOutlet var dayLabels: [UILabel]!
+    @IBOutlet weak var clientButton: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()

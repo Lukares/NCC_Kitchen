@@ -11,6 +11,7 @@ import UIKit
 class clientProductCell: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet var dayLabels: [UILabel]!
     
     override func awakeFromNib() {
         super.awakeFromNib()

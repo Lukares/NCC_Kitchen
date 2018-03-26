@@ -7,15 +7,49 @@
 //
 
 import UIKit
+import CoreData
 
 class WeeklyViewController: UIViewController {
 
-    let tempProducts = ["Apple Pie", "Bacon Cheddar Scone", "Lemon Pie", "Banana Nutella Loaf"]
+    var productList:[(name: String, clients: NSSet, sun:Int16, mon:Int16, tues: Int16, wed:Int16, thurs: Int16, fri:Int16, sat: Int16, tot: Int16)] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        let managedContext = appDelegate?.persistentContainer.viewContext
+        
+        let fetchProductRequest =  NSFetchRequest<NSManagedObject>(entityName: "Product")
+        
+        var pt = [Product]()
+        do {
+            pt = (try managedContext?.fetch(fetchProductRequest))! as! [Product]
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+        print("Products from Core Data")
+        for p in pt {
+            var quantities:(sun:Int16, mon:Int16, tues: Int16, wed:Int16, thurs: Int16, fri:Int16, sat: Int16, tot: Int16) = (sun:0, mon:0, tues: 0, wed:0, thurs: 0, fri:0, sat: 0, tot: 0)
+            var hasClients = false
+            for o in p.order! {
+                hasClients = true
+                let order = o as! Order
+                quantities.mon = quantities.mon+order.monday
+                quantities.tues = quantities.tues+order.tuesday
+                quantities.wed = quantities.wed+order.wednesday
+                quantities.thurs = quantities.thurs+order.thursday
+                quantities.fri = quantities.fri+order.friday
+                quantities.sat = quantities.sat+order.saturday
+                quantities.sun = quantities.sun+order.sunday
+                quantities.tot = quantities.mon + quantities.tues + quantities.wed + quantities.thurs + quantities.fri + quantities.sat + quantities.sun
+            }
+            if hasClients {
+                productList.append((name: p.name!, clients: p.order!, sun:quantities.sun, mon:quantities.mon, tues: quantities.tues, wed:quantities.wed, thurs: quantities.thurs, fri:quantities.fri, sat: quantities.sat, tot: quantities.tot))
+            }
+        }
+        productList.sort(by: {$0.name < $1.name})
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -49,25 +83,38 @@ extension WeeklyViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return tempProducts.count
+        return productList.count
     }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "weekCell", for: indexPath) as! weekCell
         
-        cell.productLabel.text = tempProducts[indexPath.row]
+        let count = productList[indexPath.row].clients.count
+        let suffix1 = (count > 1) ? "s" : ""
+        let suffix2 = (count > 1) ? "" : "s"
+        cell.productLabel.text = productList[indexPath.row].name
+        cell.clientButton.setTitle("\(count) client\(suffix1) order\(suffix2) this", for: .normal)
+        cell.dayLabels[0].text = String(productList[indexPath.row].sun)
+        cell.dayLabels[1].text = String(productList[indexPath.row].mon)
+        cell.dayLabels[2].text = String(productList[indexPath.row].tues)
+        cell.dayLabels[3].text = String(productList[indexPath.row].wed)
+        cell.dayLabels[4].text = String(productList[indexPath.row].thurs)
+        cell.dayLabels[5].text = String(productList[indexPath.row].fri)
+        cell.dayLabels[6].text = String(productList[indexPath.row].sat)
+        cell.dayLabels[7].text = String(productList[indexPath.row].tot)
+        
         return cell
     }
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("selected")
-        let selectedProduct = tempProducts[indexPath.row]
+        let selectedProduct = productList[indexPath.row]
         
         let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productPage") as! ProductViewController
         self.navigationController?.show(controller, sender: nil)
-        controller.recievedTitle = selectedProduct
+        controller.recievedTitle = selectedProduct.name
         tableView.deselectRow(at: indexPath, animated: false)
     }
     

@@ -68,10 +68,10 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selected = mainOptions[indexPath.row]
         if selected == "Clients" {
-            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientController") as UIViewController
+            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientListController") as UIViewController
             self.navigationController?.show(controller, sender: self)
         } else if selected == "Products" {
-            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productController") as UIViewController
+            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productListController") as UIViewController
             self.navigationController?.show(controller, sender: self)
         } else if selected == "Home" {
             let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "homePage")
