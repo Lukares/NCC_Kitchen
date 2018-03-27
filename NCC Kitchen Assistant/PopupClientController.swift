@@ -14,17 +14,18 @@ protocol PopupDelegate {
 
 class PopupClientController: UITableViewController {
 
-    let tempClients = ["Avoca", "Cafe Victoria", "Criswell"]
+    var clientList:[String] = []
+    var clientSet = NSSet()
     var delegate : PopupDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        for o in clientSet {
+            let order = o as! Order
+            let clientName = order.orderingClient!.name!
+            clientList.append(clientName)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,13 +42,13 @@ class PopupClientController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return tempClients.count
+        return clientList.count
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "clientCell", for: indexPath)
-        cell.textLabel?.text = tempClients[indexPath.row]
+        cell.textLabel?.text = clientList[indexPath.row]
         return cell
     }
     
@@ -56,7 +57,7 @@ class PopupClientController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("selected")
-        let selectedClient = tempClients[indexPath.row]
+        let selectedClient = clientList[indexPath.row]
         
         self.dismiss(animated: true, completion: nil)
         self.delegate?.showClient(name: selectedClient)

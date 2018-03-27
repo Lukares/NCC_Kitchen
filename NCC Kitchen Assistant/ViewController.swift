@@ -5,6 +5,7 @@ import MSAL
 import Alamofire
 
 var controllerSet = [String: UIViewController]()
+var accessToken = String()
 
 class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate {
     
@@ -16,7 +17,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     
     let kDocumentID = ""
     
-    var accessToken = String()
+    
     var refreshToken = String()
     var applicationContext = MSALPublicClientApplication.init()
     
@@ -25,9 +26,10 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     var docList:[(name: String, id: String)] = []
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var docPicker: UIPickerView!
     @IBOutlet weak var loggingText: UITextView!
     @IBOutlet weak var signoutButton: UIButton!
+    @IBOutlet weak var settingsButton: UIButton!
+    @IBOutlet weak var downloadButton: UIButton!
     
     
     override func viewDidLoad() {
@@ -49,13 +51,22 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     
     override func viewWillAppear(_ animated: Bool) {
         
-        if self.accessToken.isEmpty {
+        if accessToken.isEmpty {
             signoutButton.isEnabled = false; 
         }
     }
     
     @IBAction func unwindToHome(segue: UIStoryboardSegue) {
         
+    }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "settinsPopup" {
+            let vc = segue.destination as! SettingsPopupViewController
+            let but = sender as! UIButton
+            vc.popoverPresentationController?.sourceView = but
+        }
     }
     
     
@@ -78,10 +89,12 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                 try self.applicationContext.acquireTokenSilent(forScopes: self.kScopes, user: applicationContext.users().first) { (result, error) in
                     
                     if error == nil {
-                        self.accessToken = (result?.accessToken)!
+                        accessToken = (result?.accessToken)!
                         self.loggingText.text = "Refreshing token silently)"
-                        self.loggingText.text = "Refreshed Access token is \(self.accessToken)"
+                        self.loggingText.text = "Refreshed Access token is \(accessToken)"
                         self.signoutButton.isEnabled = true;
+                        self.downloadButton.isEnabled = true;
+                        self.settingsButton.isEnabled = true;
 //                        self.getContentWithToken(self.kGraphURI)
                         
                         self.makeRequest(self.kGraphURI + "/drive/root/search(q='.xls')?select=name,id,webUrl") { jsonResult in
@@ -95,10 +108,6 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                                 self.docList.append((name, id))
                             }
                             
-                            // do something with the returned Bool
-                            DispatchQueue.main.async {
-                                self.docPicker.reloadAllComponents()
-                            }
                         }
                         
                     } else {
@@ -117,10 +126,11 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                 
                 self.applicationContext.acquireToken(forScopes: self.kScopes) { (result, error) in
                     if error == nil {
-                        self.accessToken = (result?.accessToken)!
-                        self.loggingText.text = "Access token is \(self.accessToken)"
+                        accessToken = (result?.accessToken)!
+                        self.loggingText.text = "Access token is \(accessToken)"
                         self.signoutButton.isEnabled = true;
-//                        self.getContentWithToken(self.kGraphURI)
+                        self.settingsButton.isEnabled = true;
+                        self.downloadButton.isEnabled = true;
                         
                     } else  {
                         self.loggingText.text = "Could not acquire token: \(error ?? "No error information" as! Error)"
@@ -198,7 +208,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         var request = URLRequest(url: url!)
 
         // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
-        request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("bearer \(accessToken)", forHTTPHeaderField: "Authorization")
         let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
 
         urlSession.dataTask(with: request) { data, response, error in
@@ -218,6 +228,8 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             
             try self.applicationContext.remove(self.applicationContext.users().first)
             self.signoutButton.isEnabled = false;
+            self.settingsButton.isEnabled = false;
+            self.downloadButton.isEnabled = false;
             self.loggingText.text = "Logged out"
             
         } catch let error {
@@ -228,8 +240,6 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     
     @IBAction func selectDocument(_ sender: Any) {
         activityIndicator.startAnimating()
-        let id = docList[docPicker.selectedRow(inComponent: 0)].id
-        print("Selected ID: " + id)
         
         var productList:[Product] = []
         var clientList:[Client] = []
@@ -237,145 +247,138 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         let managedContext = appDelegate?.persistentContainer.viewContext
-//        let prodEntity = NSEntityDescription.entity(forEntityName: "Product", in: managedContext!)!
-//        let clientEntity = NSEntityDescription.entity(forEntityName: "Client", in: managedContext!)!
         
+        let id = defaults.value(forKey: "docID") as! String
+        let customerPath = (defaults.value(forKey: "customerSource") as! String).replacingOccurrences(of: " ", with: "%20")
+        let productPath = (defaults.value(forKey: "productSource") as! String).replacingOccurrences(of: " ", with: "%20")
+        let orderPath = (defaults.value(forKey: "orderSource") as! String).replacingOccurrences(of: " ", with: "%20")
         
-        makeRequest(kGraphURI + "drive/items/\(id)/workbook/worksheets", completion: { jsonResult in
+        //Collecting client data
+        
+        self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('\(customerPath)')/usedRange", completion: { worksheetData in
             // do something with the returned json
-            for obj in jsonResult["value"] {
-                print("Worksheet named \(obj.1["name"])")
-        
-                //Collecting client data
-                if obj.1["name"].string == "Customer" {
-                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Customer')/usedRange", completion: { worksheetData in
-                        // do something with the returned json
-                        
-                        print("\n\nList of products:\n")
-                        var i = 1
-                        while worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0 {
-                            
-//                            let tempClient:Client = Client()
-                            let tempClient = NSEntityDescription.insertNewObject(forEntityName: "Client", into: managedContext!) as! Client
-                            
-                            tempClient.name = worksheetData["formulas"][i][0].string!
-                            tempClient.address = worksheetData["formulas"][i][1].string! + " " + worksheetData["formulas"][i][2].string!
-//                            managedContext?.insert(tempClient)
-                            clientList.append(tempClient)
-                            i += 1
-                        }
-                        
-                    })
-                }
+            
+            print("\n\nList of products:\n")
+            var i = 1
+            while worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0 {
                 
-                //Get list of products from Product sheet
-                else if obj.1["name"].string == "Products" {
-                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Products')/usedRange", completion: { worksheetData in
-                        // do something with the returned json
-                        
-//                        print("\n\nList of products:\n")
-                        var i = 1
-                        while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
-                            
-                            let tempProd = NSEntityDescription.insertNewObject(forEntityName: "Product", into: managedContext!) as! Product
-                            tempProd.name = worksheetData["formulas"][i][0].string!
-                            if let price = worksheetData["formulas"][i][4].double {
-                                tempProd.price = price
-                            } else { tempProd.price = 0}
-                            productList.append(tempProd)
-//                            managedContext?.insert(tempProd)
-                            i += 1
-                        }
-                    })
-                }
-                    
-                    //Get product details from Weekly orders
-                else if obj.1["name"].string == "Weekly Orders" {
-                    self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('Weekly%20Orders')/usedRange", completion: { worksheetData in
-                        // do something with the returned json
-                        
-                        var i = 1
-                        while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
-                            
-                            let prodName = worksheetData["formulas"][i][0].string!
-                            let orderingClient = worksheetData["formulas"][i][8].string!
-                            
-                            print("Found order in excel: Product = \"\(prodName)\"; Client = \"\(orderingClient)\"")
-                            
-                            for thisProduct in productList {
-                                print("Searching for existing product in ProductList: " + thisProduct.name!)
-                                
-                                if thisProduct.name == prodName {
-                                    print("Found matching product")
-                                    if let cat = worksheetData["formulas"][i][9].int16 {
-                                        thisProduct.catagory = cat
-                                    } else {thisProduct.catagory = 0}
-                                    for thisClient in clientList {
-                                        print("Searching for existing client in ClientList: " + thisClient.name!)
-                                        if thisClient.name == orderingClient { // Found Client/Product pair
-                                            print("Found matching client")
-                                            let tempOrder = NSEntityDescription.insertNewObject(forEntityName: "Order", into: managedContext!) as! Order
-                                            tempOrder.productType = thisProduct
-                                            tempOrder.orderingClient = thisClient
-                                            if let mon = worksheetData["formulas"][i][1].int16 {
-                                                tempOrder.monday = mon
-                                            } else { tempOrder.monday = 0 }
-                                            
-                                            if let tues = worksheetData["formulas"][i][2].int16 {
-                                                tempOrder.tuesday = tues
-                                            } else { tempOrder.tuesday = 0 }
-                                            
-                                            if let wed = worksheetData["formulas"][i][3].int16 {
-                                                tempOrder.wednesday = wed
-                                            } else { tempOrder.wednesday = 0 }
-                                            
-                                            if let thur = worksheetData["formulas"][i][4].int16 {
-                                                tempOrder.thursday = thur
-                                            } else { tempOrder.thursday = 0 }
-                                            
-                                            if let fri = worksheetData["formulas"][i][5].int16 {
-                                                tempOrder.friday = fri
-                                            } else { tempOrder.friday = 0 }
-                                            
-                                            if let sat = worksheetData["formulas"][i][6].int16 {
-                                                tempOrder.saturday = sat
-                                            } else { tempOrder.saturday = 0 }
-                                            
-                                            if let sun = worksheetData["formulas"][i][7].int16 {
-                                                tempOrder.sunday = sun
-                                            } else { tempOrder.sunday = 0 }
-                                            
-                                            break //Break out of client search loop
-                                        }
-                                    }
-                                    break //Break out of product search loop
-                                }
-                                
-//                                managedContext?.insert(tempOrder)
-                                
-                            }
-                            
-                            i += 1
-                        }
-                        
-                        DispatchQueue.main.async {
-                            // update UI
-                            do { // Saved to Core Data
-                                try managedContext?.save()
-                                self.defaults.set(Date(), forKey: "lastUpdate")
-                                self.activityIndicator.stopAnimating()
-                                print("Saved to Core Data")
-                            } catch let error as NSError {
-                                print("Could not save. \(error), \(error.userInfo)")
-                            }
-                        }
-                    })
-                }
+                //                            let tempClient:Client = Client()
+                let tempClient = NSEntityDescription.insertNewObject(forEntityName: "Client", into: managedContext!) as! Client
+                
+                tempClient.name = worksheetData["formulas"][i][0].string!
+                tempClient.address = worksheetData["formulas"][i][1].string! + " " + worksheetData["formulas"][i][2].string!
+                //                            managedContext?.insert(tempClient)
+                clientList.append(tempClient)
+                i += 1
             }
             
-        }) // End of get worksheet names
+            
+            //Get list of products from Product sheet
+            self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('\(productPath)')/usedRange", completion: { worksheetData in
+                // do something with the returned json
+                
+                //                        print("\n\nList of products:\n")
+                var i = 1
+                while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
+                    
+                    let tempProd = NSEntityDescription.insertNewObject(forEntityName: "Product", into: managedContext!) as! Product
+                    tempProd.name = worksheetData["formulas"][i][0].string!
+                    if let price = worksheetData["formulas"][i][4].double {
+                        tempProd.price = price
+                    } else { tempProd.price = 0}
+                    productList.append(tempProd)
+                    
+                    i += 1
+                }
+                
+                
+                
+                //Get product details from Weekly orders
+                self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('\(orderPath)')/usedRange", completion: { worksheetData in
+                    // do something with the returned json
+                    
+                    var i = 1
+                    while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
+                        
+                        let prodName = worksheetData["formulas"][i][0].string!
+                        let orderingClient = worksheetData["formulas"][i][8].string!
+                        
+                        print("Found order in excel: Product = \"\(prodName)\"; Client = \"\(orderingClient)\"")
+                        
+                        for thisProduct in productList {
+                            print("Searching for existing product in ProductList: " + thisProduct.name!)
+                            
+                            if thisProduct.name == prodName {
+                                print("Found matching product")
+                                if let cat = worksheetData["formulas"][i][9].int16 {
+                                    thisProduct.catagory = cat
+                                } else {thisProduct.catagory = 0}
+                                for thisClient in clientList {
+                                    print("Searching for existing client in ClientList: " + thisClient.name!)
+                                    if thisClient.name == orderingClient { // Found Client/Product pair
+                                        print("Found matching client")
+                                        let tempOrder = NSEntityDescription.insertNewObject(forEntityName: "Order", into: managedContext!) as! Order
+                                        tempOrder.productType = thisProduct
+                                        tempOrder.orderingClient = thisClient
+                                        if let mon = worksheetData["formulas"][i][1].int16 {
+                                            tempOrder.monday = mon
+                                        } else { tempOrder.monday = 0 }
+                                        
+                                        if let tues = worksheetData["formulas"][i][2].int16 {
+                                            tempOrder.tuesday = tues
+                                        } else { tempOrder.tuesday = 0 }
+                                        
+                                        if let wed = worksheetData["formulas"][i][3].int16 {
+                                            tempOrder.wednesday = wed
+                                        } else { tempOrder.wednesday = 0 }
+                                        
+                                        if let thur = worksheetData["formulas"][i][4].int16 {
+                                            tempOrder.thursday = thur
+                                        } else { tempOrder.thursday = 0 }
+                                        
+                                        if let fri = worksheetData["formulas"][i][5].int16 {
+                                            tempOrder.friday = fri
+                                        } else { tempOrder.friday = 0 }
+                                        
+                                        if let sat = worksheetData["formulas"][i][6].int16 {
+                                            tempOrder.saturday = sat
+                                        } else { tempOrder.saturday = 0 }
+                                        
+                                        if let sun = worksheetData["formulas"][i][7].int16 {
+                                            tempOrder.sunday = sun
+                                        } else { tempOrder.sunday = 0 }
+                                        
+                                        break //Break out of client search loop
+                                    }
+                                }
+                                break //Break out of product search loop
+                            }
+                            
+                        }
+                        
+                        i += 1
+                    }
+                    
+                    DispatchQueue.main.async {
+                        // update UI
+                        do { // Saved to Core Data
+                            try managedContext?.save()
+                            self.defaults.set(Date(), forKey: "lastUpdate")
+                            self.activityIndicator.stopAnimating()
+                            print("Saved to Core Data")
+                        } catch let error as NSError {
+                            print("Could not save. \(error), \(error.userInfo)")
+                        }
+                    }
+                })
+                
+            })
+            
+        })
+        
     }
 }
+
 
 
 extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {

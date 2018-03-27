@@ -10,7 +10,7 @@ import UIKit
 
 class MainTableViewController: UITableViewController {
     
-    let mainOptions = ["Home", "Today", "Weekly View", "Clients", "Products"]
+    let mainOptions = ["Home", /*"Today",*/ "Weekly View", "Clients", "Products"]
 
     override func viewDidLoad() {
         super.viewDidLoad()

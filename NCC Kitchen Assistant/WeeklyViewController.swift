@@ -11,6 +11,7 @@ import CoreData
 
 class WeeklyViewController: UIViewController {
 
+    @IBOutlet weak var tableView: UITableView!
     var productList:[(name: String, clients: NSSet, sun:Int16, mon:Int16, tues: Int16, wed:Int16, thurs: Int16, fri:Int16, sat: Int16, tot: Int16)] = []
     
     override func viewDidLoad() {
@@ -65,7 +66,11 @@ class WeeklyViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "clientPopup" {
             let vc = segue.destination as! PopupClientController
-            vc.popoverPresentationController?.sourceView = sender as! UIButton
+            let but = sender as! UIButton
+            vc.popoverPresentationController?.sourceView = but
+            let sendCell = but.superview?.superview as! weekCell
+            let index = tableView.indexPath(for: sendCell)?.row
+            vc.clientSet = productList[index!].clients
             vc.delegate = self
         }
     }
