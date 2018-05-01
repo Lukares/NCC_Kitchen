@@ -28,7 +28,7 @@
     </entity>
     <elements>
         <element name="Client" positionX="-425" positionY="-18" width="128" height="103"/>
-        <element name="Order" positionX="-198" positionY="54" width="128" height="195"/>
+        <element name="Order" positionX="-189" positionY="39" width="128" height="195"/>
         <element name="Product" positionX="27" positionY="-16" width="128" height="133"/>
     </elements>
 </model>

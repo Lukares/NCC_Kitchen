@@ -31,25 +31,10 @@ class ProductListViewController: UIViewController, UITableViewDelegate, UITableV
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.getData), name: Notification.Name("databaseRefreshed"), object: nil)
+        getData()
         
-        //Fetch Core Data
         
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        let managedContext = appDelegate?.persistentContainer.viewContext
-        
-        let fetchProductRequest =  NSFetchRequest<NSManagedObject>(entityName: "Product")
-        
-        var pt = [Product]()
-        do {
-            pt = (try managedContext?.fetch(fetchProductRequest))! as! [Product]
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
-        print("Products from Core Data")
-        for p in pt {
-//            print(p.value(forKeyPath: "name") as! String)
-            productList.append((p.name!, (p.order?.count)!))
-        }
         
         sortingBar.selectedItem = sortingBar.items?[0]
         productList.sort(by: {
@@ -66,6 +51,30 @@ class ProductListViewController: UIViewController, UITableViewDelegate, UITableV
         imageView.contentMode = .scaleAspectFit
         self.navigationItem.titleView = imageView
         
+    }
+    
+    
+    @objc func getData() {
+        //Fetch Core Data
+        
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        let managedContext = appDelegate?.persistentContainer.viewContext
+        
+        let fetchProductRequest =  NSFetchRequest<NSManagedObject>(entityName: "Product")
+        
+        var pt = [Product]()
+        do {
+            pt = (try managedContext?.fetch(fetchProductRequest))! as! [Product]
+        } catch let error as NSError {
+            print("Could not fetch. \(error), \(error.userInfo)")
+        }
+        print("Products from Core Data")
+        productList = []
+        for p in pt {
+            //            print(p.value(forKeyPath: "name") as! String)
+            productList.append((p.name!, (p.order?.count)!))
+        }
+        self.tableView.reloadData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -109,12 +118,12 @@ class ProductListViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         //Selected tab bar
-        if tabBar.items![0] == item {
+        if tabBar.items![0] == item {  //Sort by most common.
             productList.sort(by: {
                 if $0.1 != $1.1 {
                     return $0.1 > $1.1
                 }
-                else {
+                else {          //
                     return $0.0 < $1.0
                 }
             })

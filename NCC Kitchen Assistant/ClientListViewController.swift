@@ -22,6 +22,17 @@ class ClientListViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.getData), name: Notification.Name("databaseRefreshed"), object: nil)
+        getData()
+        
+        let icon = UIImage(named: "clients.png")
+        let imageView = UIImageView(image:icon)
+        imageView.contentMode = .scaleAspectFit
+        self.navigationItem.titleView = imageView
+    }
+    
+    
+    @objc func getData() {
         //Fetch Client data from Core Data
         
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
@@ -30,7 +41,7 @@ class ClientListViewController: UITableViewController {
         let fetchClientRequest =  NSFetchRequest<NSManagedObject>(entityName: "Client")
         
         var ct = [NSManagedObject]()
-
+        
         do {
             ct = (try managedContext?.fetch(fetchClientRequest))!
         } catch let error as NSError {
@@ -38,18 +49,16 @@ class ClientListViewController: UITableViewController {
         }
         
         print("Clients from Core Data")
+        clientList = []
         for c in ct {
-//            print(c.value(forKeyPath: "name") as! String)
+            //            print(c.value(forKeyPath: "name") as! String)
             clientList.append(c.value(forKeyPath: "name") as! String)
         }
         
         clientList.sort()
-        
-        let icon = UIImage(named: "clients.png")
-        let imageView = UIImageView(image:icon)
-        imageView.contentMode = .scaleAspectFit
-        self.navigationItem.titleView = imageView
+        self.tableView.reloadData()
     }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

@@ -85,6 +85,14 @@ extension ClientViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if !(indexPath.row%2 == 0) {
+            cell.backgroundColor = UIColor(red: 154/255, green: 199/255, blue: 124/255, alpha: 1.0)
+        } else {
+            cell.backgroundColor = UIColor.white
+        }
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("selected")
         let selectedProduct = productList[indexPath.row]

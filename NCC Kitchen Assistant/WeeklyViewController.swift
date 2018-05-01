@@ -16,7 +16,13 @@ class WeeklyViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.getData), name: Notification.Name("databaseRefreshed"), object: nil)
+        getData()
+        
+    }
+    
+    @objc func getData() {
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         let managedContext = appDelegate?.persistentContainer.viewContext
         
@@ -29,6 +35,7 @@ class WeeklyViewController: UIViewController {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
         print("Products from Core Data")
+        productList = []
         for p in pt {
             var quantities:(sun:Int16, mon:Int16, tues: Int16, wed:Int16, thurs: Int16, fri:Int16, sat: Int16, tot: Int16) = (sun:0, mon:0, tues: 0, wed:0, thurs: 0, fri:0, sat: 0, tot: 0)
             var hasClients = false
@@ -49,8 +56,6 @@ class WeeklyViewController: UIViewController {
             }
         }
         productList.sort(by: {$0.name < $1.name})
-        
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -68,6 +73,7 @@ class WeeklyViewController: UIViewController {
             let vc = segue.destination as! PopupClientController
             let but = sender as! UIButton
             vc.popoverPresentationController?.sourceView = but
+            vc.popoverPresentationController?.sourceRect = but.bounds
             let sendCell = but.superview?.superview as! weekCell
             let index = tableView.indexPath(for: sendCell)?.row
             vc.clientSet = productList[index!].clients
@@ -94,7 +100,7 @@ extension WeeklyViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "weekCell", for: indexPath) as! weekCell
-        
+
         let count = productList[indexPath.row].clients.count
         let suffix1 = (count > 1) ? "s" : ""
         let suffix2 = (count > 1) ? "" : "s"
@@ -110,6 +116,14 @@ extension WeeklyViewController: UITableViewDelegate, UITableViewDataSource {
         cell.dayLabels[7].text = String(productList[indexPath.row].tot)
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if !(indexPath.row%2 == 0) {
+            cell.backgroundColor = UIColor(red: 154/255, green: 199/255, blue: 124/255, alpha: 1.0)
+        } else {
+            cell.backgroundColor = UIColor.white
+        }
     }
     
     

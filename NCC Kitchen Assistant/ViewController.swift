@@ -26,21 +26,25 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
     var docList:[(name: String, id: String)] = []
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var loggingText: UITextView!
     @IBOutlet weak var signoutButton: UIButton!
     @IBOutlet weak var settingsButton: UIButton!
     @IBOutlet weak var downloadButton: UIButton!
+    @IBOutlet weak var dateLabel: UILabel!
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if controllerSet["homePage"] == nil {
+            controllerSet["homePage"] = self
+        }
         
         do {
             // Initialize a MSALPublicClientApplication with a given clientID and authority
             self.applicationContext = try MSALPublicClientApplication.init(clientId: kClientID, authority: kAuthority)
         } catch {
-            self.loggingText.text = "Unable to create Application Context. Error: \(error)"
+            print(error)
         }
+        updateDateLabel()
     }
     
     
@@ -60,12 +64,21 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
         
     }
     
+    func updateDateLabel() {
+        if let date = defaults.value(forKey: "lastUpdate") as? Date {
+            dateLabel.text = "Last updated:\n"+date.toString(dateFormat: "HH:mma MM/dd/yy")
+        } else {
+            dateLabel.text = ""
+        }
+    }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "settinsPopup" {
+        if segue.identifier == "settingsPopup" {
             let vc = segue.destination as! SettingsPopupViewController
             let but = sender as! UIButton
             vc.popoverPresentationController?.sourceView = but
+            vc.popoverPresentationController?.sourceRect = but.bounds
         }
     }
     
@@ -90,15 +103,14 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                     
                     if error == nil {
                         accessToken = (result?.accessToken)!
-                        self.loggingText.text = "Refreshing token silently)"
-                        self.loggingText.text = "Refreshed Access token is \(accessToken)"
-                        self.signoutButton.isEnabled = true;
-                        self.downloadButton.isEnabled = true;
-                        self.settingsButton.isEnabled = true;
-//                        self.getContentWithToken(self.kGraphURI)
+                        
+                        DispatchQueue.main.async {
+                            self.signoutButton.isEnabled = true;                            //Main thread ERROR
+                            self.downloadButton.isEnabled = true;
+                            self.settingsButton.isEnabled = true;
+                        }
                         
                         self.makeRequest(self.kGraphURI + "/drive/root/search(q='.xls')?select=name,id,webUrl") { jsonResult in
-//                            print("List of files \n\n"+result.debugDescription)
                             
                             for obj in jsonResult["value"] {
                                 print("HELLO THERE\n\n\n\(obj.1["name"]) \(obj.1["id"])")
@@ -111,7 +123,7 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                         }
                         
                     } else {
-                        self.loggingText.text = "Could not acquire token silently: \(error ?? "No error information" as! Error)"
+//                        self.loggingText.text = "Could not acquire token silently: \(error ?? "No error information" as! Error)"
                         
                     }
                 }
@@ -127,13 +139,13 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                 self.applicationContext.acquireToken(forScopes: self.kScopes) { (result, error) in
                     if error == nil {
                         accessToken = (result?.accessToken)!
-                        self.loggingText.text = "Access token is \(accessToken)"
+//                        self.loggingText.text = "Access token is \(accessToken)"
                         self.signoutButton.isEnabled = true;
                         self.settingsButton.isEnabled = true;
                         self.downloadButton.isEnabled = true;
                         
                     } else  {
-                        self.loggingText.text = "Could not acquire token: \(error ?? "No error information" as! Error)"
+//                        self.loggingText.text = "Could not acquire token: \(error ?? "No error information" as! Error)"
                     }
                 }
                 
@@ -143,33 +155,10 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             
             // This is the catch all error.
             
-            self.loggingText.text = "Unable to acquire token. Got error: \(error)"
+//            self.loggingText.text = "Unable to acquire token. Got error: \(error)"
         }
         
     }
-    
-//    func getContentWithToken(_ api_call: String) {
-//
-//        let sessionConfig = URLSessionConfiguration.default
-//
-//        // Specify the Graph API endpoint
-//        let url = URL(string: api_call)
-//        var request = URLRequest(url: url!)
-//
-//        // Set the Authorization header for the request. We use Bearer tokens, so we specify Bearer + the token we got from the result
-//        request.setValue("bearer \(self.accessToken)", forHTTPHeaderField: "Authorization")
-//        let urlSession = URLSession(configuration: sessionConfig, delegate: self, delegateQueue: OperationQueue.main)
-//
-//        urlSession.dataTask(with: request) { data, response, error in
-//            let result = try? JSONSerialization.jsonObject(with: data!, options: [])
-//            if result != nil {
-//
-//                print(result.debugDescription)
-//            }
-//            }.resume()
-//    }
-//
-    
     
     
     @IBAction func testButton(_ sender: Any) {
@@ -230,10 +219,9 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             self.signoutButton.isEnabled = false;
             self.settingsButton.isEnabled = false;
             self.downloadButton.isEnabled = false;
-            self.loggingText.text = "Logged out"
             
         } catch let error {
-            self.loggingText.text = "Received error signing user out: \(error)"
+            print("Received error signing user out: \(error)")
         }
     }
     
@@ -262,13 +250,12 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             var i = 1
             while worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0 {
                 
-                //                            let tempClient:Client = Client()
                 let tempClient = NSEntityDescription.insertNewObject(forEntityName: "Client", into: managedContext!) as! Client
                 
                 tempClient.name = worksheetData["formulas"][i][0].string!
                 tempClient.address = worksheetData["formulas"][i][1].string! + " " + worksheetData["formulas"][i][2].string!
-                //                            managedContext?.insert(tempClient)
                 clientList.append(tempClient)
+                
                 i += 1
             }
             
@@ -277,7 +264,6 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
             self.makeRequest(self.kGraphURI + "drive/items/\(id)/workbook/worksheets('\(productPath)')/usedRange", completion: { worksheetData in
                 // do something with the returned json
                 
-                //                        print("\n\nList of products:\n")
                 var i = 1
                 while  worksheetData["formulas"][i][0] != JSON.null && worksheetData["formulas"][i][0].string!.count > 0{
                     
@@ -362,9 +348,24 @@ class ViewController: UIViewController, UITextFieldDelegate, URLSessionDelegate 
                     DispatchQueue.main.async {
                         // update UI
                         do { // Saved to Core Data
+                            
+                            let fetch1 = NSFetchRequest<NSFetchRequestResult>(entityName: "Product")
+                            let request1 = NSBatchDeleteRequest(fetchRequest: fetch1)
+                            let result1 = try managedContext?.execute(request1)
+                            
+                            let fetch2 = NSFetchRequest<NSFetchRequestResult>(entityName: "Client")
+                            let request2 = NSBatchDeleteRequest(fetchRequest: fetch2)
+                            let result2 = try managedContext?.execute(request2)
+                            
+                            let fetch3 = NSFetchRequest<NSFetchRequestResult>(entityName: "Order")
+                            let request3 = NSBatchDeleteRequest(fetchRequest: fetch3)
+                            let result3 = try managedContext?.execute(request3)
+                            
                             try managedContext?.save()
                             self.defaults.set(Date(), forKey: "lastUpdate")
                             self.activityIndicator.stopAnimating()
+                            self.updateDateLabel()
+                            NotificationCenter.default.post(name: Notification.Name("databaseRefreshed"), object: nil, userInfo: nil)
                             print("Saved to Core Data")
                         } catch let error as NSError {
                             print("Could not save. \(error), \(error.userInfo)")
@@ -397,3 +398,12 @@ extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
 }
 
+extension Date {
+    
+    func toString( dateFormat format  : String ) -> String
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = format
+        return dateFormatter.string(from: self)
+    }
+}

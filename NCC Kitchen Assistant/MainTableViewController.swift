@@ -10,7 +10,7 @@ import UIKit
 
 class MainTableViewController: UITableViewController {
     
-    let mainOptions = ["Home", /*"Today",*/ "Weekly View", "Clients", "Products"]
+    let mainOptions = ["Home", "Today", "Weekly View", "Clients", "Products", "Manage Orders"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,6 +20,7 @@ class MainTableViewController: UITableViewController {
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        self.tableView.selectRow(at: IndexPath(row:0, section:0) , animated: false, scrollPosition: .top)
     }
 
     override func didReceiveMemoryWarning() {
@@ -41,9 +42,9 @@ class MainTableViewController: UITableViewController {
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "basicCell", for: indexPath) as! mainCell
         let cellTitle = mainOptions[indexPath.row]
-        cell.textLabel?.text = cellTitle
+        cell.mainLabel.text = cellTitle
         var imageTitle = ""
         switch cellTitle {
         case "Home":
@@ -56,11 +57,13 @@ class MainTableViewController: UITableViewController {
             imageTitle = "clients.png"
         case "Products":
             imageTitle = "pie.png"
+        case "Manage Orders":
+            imageTitle = "smile.png"
         default:
             imageTitle = "home.png"
         }
         
-        cell.imageView?.image = UIImage(named: imageTitle)
+        cell.icon.image = UIImage(named: imageTitle)
         return cell
     }
     
@@ -68,20 +71,44 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selected = mainOptions[indexPath.row]
         if selected == "Clients" {
-            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientListController") as UIViewController
+            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "clientListController") as UIViewController
             self.navigationController?.show(controller, sender: self)
-        } else if selected == "Products" {
-            let controller:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productListController") as UIViewController
+        }
+        else if selected == "Products" {
+            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "productListController") as UIViewController
             self.navigationController?.show(controller, sender: self)
-        } else if selected == "Home" {
-            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "homePage")
+        }
+        else if selected == "Home" {
+            var controller = UIViewController()
+            if let temp = controllerSet["homePage"] {
+                controller = temp
+            } else {
+                controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "homePage")
+            }
             splitViewController?.showDetailViewController(controller, sender: nil)
         }
         else if selected == "Weekly View" {
-            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "weekRootNav") as! UINavigationController
+            var controller = UIViewController()
+            if let temp = controllerSet["weekRootNav"] as? UINavigationController {
+                controller = temp
+            } else {
+                controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "weekRootNav") as! UINavigationController
+                controllerSet["weekRootNav"] = controller
+            }
             splitViewController?.showDetailViewController(controller, sender: nil)
-        } else if selected == "Today" {
-            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "todayRootNav") as! UINavigationController
+        }
+        else if selected == "Today" {
+            var controller = UIViewController()
+            if let temp = controllerSet["todayRootNav"] as? UINavigationController {
+                controller = temp
+            } else {
+                controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "todayRootNav") as! UINavigationController
+                controllerSet["todayRootNav"] = controller
+            }
+            splitViewController?.showDetailViewController(controller, sender: nil)
+        }
+        else if selected == "Manage Orders" {
+            let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "updateController")
             splitViewController?.showDetailViewController(controller, sender: nil)
         }
         
